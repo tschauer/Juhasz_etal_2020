@@ -1,0 +1,10 @@
+genotype	NT	Olaparib
+siCtrl	5.745	8.241
+siBRCA1	6.942	11.893
+siALC1	5.852	15.852
+siCtrl	3.22	6.46
+siBRCA1	5.41	13
+siALC1	5.79	10.79
+siCtrl	3	3.43
+siBRCA1	13	46
+siALC1	14	39
