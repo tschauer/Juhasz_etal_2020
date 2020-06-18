@@ -36,6 +36,10 @@ colnames(dataset) <- gsub("NHEJ.","Outcome", colnames(dataset))
 dataset$genotype <- factor(gsub(" ","",dataset$genotype), levels = c("mCherry", "mCherry-ALC1"))
 dataset$experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each= length(levels(dataset$genotype))))
 
+
+kable(dataset, row.names = F)
+
+
 dataset$Offset <- NA
 for(eid in levels(dataset$experiment)){
         dataset$Offset[dataset$experiment == eid] <- mean(dataset$Outcome[dataset$experiment == eid])
@@ -50,6 +54,8 @@ for(gid in levels(dataset$genotype)){
 }
 
 dataset$NormOutcome2 <- dataset$NormOutcome / dataset$Offset2
+
+
 kable(dataset, row.names = F)
 ```
 
@@ -210,11 +216,11 @@ rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], "
 # suggested result table
 kable(output, row.names = T)
 
-write.table(output, file = "FigureS5I_Stats_Ref_WT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+write.table(output, file = "FigureS5I_Stats_Ref_mCherry.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
 ```{r, fig.height=5, fig.width=18}
-# re-fit with ALC1KO reference
+# re-fit with mCherry-ALC1 reference
 dataset$genotype <- relevel(dataset$genotype, ref = "mCherry-ALC1")
 
 fit <- lm(NormOutcome2 ~ genotype, data = dataset)

@@ -1,0 +1,434 @@
+---
+title: "Figure1_ALC1_Comp"
+output: html_document
+---
+
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+.table{
+  width:auto;
+  font-size: 10px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, results=TRUE, fig.align='center', fig.height=5, fig.width=8)
+library(knitr)
+```
+
+
+## Load Data
+
+
+```{r}
+dataset <- read.delim("raw_data/Figure1_ALC1_Comp.txt", stringsAsFactors = FALSE)
+
+dataset$genotype <- gsub("\\+$","",gsub(" |mCherry","",dataset$genotype))
+dataset$genotype <-  factor(dataset$genotype, levels = unique(dataset$genotype))
+dataset$Experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each=length(levels(dataset$genotype))))
+
+# genotype+Experiment gives unique ID (UID)
+dataset$UID <- factor(paste(dataset$Experiment, dataset$genotype))
+
+
+# wide format
+kable(dataset, row.names = F)
+
+library(reshape2)
+# reshape to long format
+dataset <- melt(dataset, variable.name = "Treatment", value.name = "Counts")
+
+dataset$genotype <- relevel(dataset$genotype, ref = "WT")
+dataset$UID <- relevel(dataset$UID, ref = "exp1 WT")
+
+dataset$Olaparib <- gsub("NT","1",dataset$Treatment)
+dataset$Olaparib <- gsub("olaparib_|nM","",dataset$Olaparib)
+dataset$Olaparib <- log10(as.integer(dataset$Olaparib))
+
+
+dataset$Offset <- NA
+for(uid in levels(dataset$UID)){
+        dataset$Offset[dataset$UID == uid] <- mean(dataset$Counts[dataset$UID == uid])
+}
+
+dataset$NormCounts <- dataset$Counts / dataset$Offset
+
+
+
+dataset$Offset2 <- NA
+for(gidx in levels(dataset$genotype)){
+        dataset$Offset2[dataset$genotype == gidx] <- mean(dataset$NormCounts[dataset$genotype == gidx & dataset$Olaparib == 0])
+}
+
+dataset$NormCounts2 <- dataset$NormCounts / dataset$Offset2
+
+
+
+# long format
+kable(dataset, row.names = F)
+```
+
+
+## Plot Data
+
+
+```{r, fig.height=5, fig.width=18}
+library(ggplot2)
+
+# raw data
+ggplot(dataset, aes(x=Olaparib, y=Counts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=FALSE, colour="#666666") +
+        geom_point(aes(colour=Treatment, shape=Experiment), size=2) +        
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") +
+        scale_shape_manual(values=14:19) +
+        scale_color_manual(values=c("#999999","#0072B2","#CC79A7","#009E73"))
+```
+
+
+```{r, fig.height=4, fig.width=16}
+# Counts Linear
+ggplot(dataset, aes(x=Olaparib, y=Counts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)")
+
+
+# NormCounts Linear
+ggplot(dataset, aes(x=Olaparib, y=NormCounts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)")
+
+
+# NormCounts2 Linear
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)")
+
+# Counts Quadratic
+ggplot(dataset, aes(x=Olaparib, y=Counts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+# NormCounts Quadratic
+ggplot(dataset, aes(x=Olaparib, y=NormCounts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+# NormCounts2 Quadratic
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+# Counts Cubic
+ggplot(dataset, aes(x=Olaparib, y=Counts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+# NormCounts Cubic
+ggplot(dataset, aes(x=Olaparib, y=NormCounts)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+# NormCounts2 Cubic
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(colour="#333333") +
+        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") 
+
+
+
+pdf("Figure1_ALC1_Comp.pdf", width = 14, height = 4)
+
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) +
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_point(aes(colour = genotype)) +
+        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
+        facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") +
+        ylab(label = "Normalized Counts") +
+        scale_color_manual(values=c('#000000','#000080','#800000','#808080','#808080','#808080'))
+
+dev.off()
+
+
+```
+
+
+## Models
+
+
+```{r}
+library(MASS)
+library(DHARMa)
+library(lme4)
+library(lmerTest)
+library(bbmle)
+```
+
+### Linear formula
+
+```{r}
+fit1 <- lm(Counts ~ Experiment + Olaparib*genotype, data = dataset)
+print(summary(fit1))
+cat("AIC: ", AIC(fit1))
+
+simres <- simulateResiduals(fittedModel = fit1)
+plot(simres)
+```
+
+```{r}
+fit2 <- lm(NormCounts ~ Olaparib*genotype, data = dataset)
+print(summary(fit2))
+cat("AIC: ", AIC(fit2))
+
+simres <- simulateResiduals(fittedModel = fit2)
+plot(simres)
+```
+
+```{r}
+fit3 <- lm(NormCounts2 ~ Olaparib*genotype, data = dataset)
+print(summary(fit3))
+cat("AIC: ", AIC(fit3))
+
+simres <- simulateResiduals(fittedModel = fit3)
+plot(simres)
+```
+
+
+```{r}
+fit4 <- lmer(Counts ~ Olaparib*genotype + (1|UID), data = dataset)
+print(summary(fit4))
+cat("AIC: ", AIC(fit4))
+
+simres <- simulateResiduals(fittedModel = fit4)
+plot(simres)
+```
+
+
+
+### Quadratic formula
+
+```{r}
+fit5 <- lm(Counts ~ Experiment + poly(Olaparib, 2)*genotype, data = dataset)
+print(summary(fit5))
+cat("AIC: ", AIC(fit5))
+
+simres <- simulateResiduals(fittedModel = fit5)
+plot(simres)
+```
+
+```{r}
+fit6 <- lm(NormCounts ~ poly(Olaparib, 2)*genotype, data = dataset)
+print(summary(fit6))
+cat("AIC: ", AIC(fit6))
+
+simres <- simulateResiduals(fittedModel = fit6)
+plot(simres)
+```
+
+```{r}
+fit7 <- lm(NormCounts2 ~ poly(Olaparib, 2)*genotype, data = dataset)
+print(summary(fit7))
+cat("AIC: ", AIC(fit7))
+
+simres <- simulateResiduals(fittedModel = fit7)
+plot(simres)
+```
+
+
+```{r}
+fit8 <- lmer(Counts ~ poly(Olaparib, 2)*genotype + (1|UID), data = dataset)
+print(summary(fit8))
+cat("AIC: ", AIC(fit8))
+
+simres <- simulateResiduals(fittedModel = fit8)
+plot(simres)
+```
+
+
+
+### Cubic formula
+
+```{r}
+fit9 <- lm(Counts ~ Experiment + poly(Olaparib, 3)*genotype, data = dataset)
+print(summary(fit9))
+cat("AIC: ", AIC(fit9))
+
+simres <- simulateResiduals(fittedModel = fit9)
+plot(simres)
+```
+
+```{r}
+fit10 <- lm(NormCounts ~ poly(Olaparib, 3)*genotype, data = dataset)
+print(summary(fit10))
+cat("AIC: ", AIC(fit10))
+
+simres <- simulateResiduals(fittedModel = fit10)
+plot(simres)
+```
+
+```{r}
+fit11 <- lm(NormCounts2 ~ poly(Olaparib, 3)*genotype, data = dataset)
+print(summary(fit11))
+cat("AIC: ", AIC(fit11))
+
+simres <- simulateResiduals(fittedModel = fit11)
+plot(simres)
+```
+
+
+```{r}
+fit12 <- lmer(Counts ~ poly(Olaparib, 3)*genotype + (1|UID), data = dataset)
+print(summary(fit12))
+cat("AIC: ", AIC(fit12))
+
+simres <- simulateResiduals(fittedModel = fit12)
+plot(simres)
+```
+
+
+# Compare Results
+
+
+```{r}
+ICtab(fit1,fit2,fit3,fit4,
+      fit5,fit6,fit7,fit8,
+      fit9,fit10,fit11,fit12,
+      base=T)
+```
+
+
+
+# Final Result
+
+```{r, fig.height=5, fig.width=18}
+fit <- fit11
+
+output <- coef(summary(fit))
+output <- output[grep("Olaparib", rownames(output)),]
+
+rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
+rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$genotype)[1],  sep = " in " )
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure1_ALC1_Comp_Stats_Ref_WT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+
+```{r, fig.height=5, fig.width=18}
+# re-fit with ALC1KO reference
+dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO")
+        
+fit <- lm(NormCounts2 ~ poly(Olaparib, 3)*genotype, data = dataset)
+
+
+output <- coef(summary(fit))
+output <- output[grep("Olaparib", rownames(output)),]
+
+rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
+rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$genotype)[1],  sep = " in " )
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure1_ALC1_Comp_Stats_Ref_ALC1KO.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+```{r, fig.height=5, fig.width=18}
+# re-fit with ALC1 KO + ALC1 WT reference
+dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO+ALC1WT")
+        
+fit <- lm(NormCounts2 ~ poly(Olaparib, 3)*genotype, data = dataset)
+
+
+output <- coef(summary(fit))
+output <- output[grep("Olaparib", rownames(output)),]
+
+rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
+rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$genotype)[1],  sep = " in " )
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure1_ALC1_Comp_Stats_Ref_ALC1KO+ALC1WT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+# Anova
+
+```{r}
+fita <- lm(NormCounts2 ~ poly(Olaparib, 3)*genotype, data = dataset)
+fitb <- lm(NormCounts2 ~ poly(Olaparib, 3)+genotype, data = dataset)
+
+# anova table
+anova(fita, fitb)
+```
+
+
+# Links
+
+* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
+* http://www.flutterbys.com.au/stats/course.html
+* https://bookdown.org/roback/bookdown-bysh/
+* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
+* https://en.wikipedia.org/wiki/Akaike_information_criterion
+
+
+

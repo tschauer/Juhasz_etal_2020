@@ -389,7 +389,80 @@ colnames(dataset) &lt;- gsub(&quot;NHEJ.&quot;,&quot;Outcome&quot;, colnames(dat
 dataset$genotype &lt;- factor(gsub(&quot; &quot;,&quot;&quot;,dataset$genotype), levels = c(&quot;siCtrl&quot;, &quot;siBRCA1&quot;, &quot;siKu70&quot;, &quot;siALC1&quot;))
 dataset$experiment &lt;- factor(rep(paste0(&quot;exp&quot;, 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each= length(levels(dataset$genotype))))
 
-dataset$Offset &lt;- NA
+
+kable(dataset, row.names = F)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">genotype</th>
+<th align="right">Outcome</th>
+<th align="left">experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">7.4396345</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">8.0603015</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">3.7985755</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">7.8118256</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">7.9170594</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">9.9909720</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">0.6460545</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">4.5512156</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">6.5727700</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">9.9655040</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">3.8856821</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">5.6197207</td>
+<td align="left">exp3</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>dataset$Offset &lt;- NA
 for(eid in levels(dataset$experiment)){
         dataset$Offset[dataset$experiment == eid] &lt;- mean(dataset$Outcome[dataset$experiment == eid])
 }
@@ -403,6 +476,8 @@ for(gid in levels(dataset$genotype)){
 }
 
 dataset$NormOutcome2 &lt;- dataset$NormOutcome / dataset$Offset2
+
+
 kable(dataset, row.names = F)</code></pre>
 <table>
 <thead>
@@ -753,8 +828,8 @@ kable(output, row.names = T)</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>write.table(output, file = &quot;FigureS5D_Stats_Ref_WT.txt&quot;, quote = F, sep = &quot;\t&quot;, row.names = T, col.names = NA)</code></pre>
-<pre class="r"><code># re-fit with ALC1KO reference
+<pre class="r"><code>write.table(output, file = &quot;FigureS5D_Stats_Ref_siCtrl.txt&quot;, quote = F, sep = &quot;\t&quot;, row.names = T, col.names = NA)</code></pre>
+<pre class="r"><code># re-fit with siALC1 reference
 dataset$genotype &lt;- relevel(dataset$genotype, ref = &quot;siALC1&quot;)
 
 fit &lt;- lm(NormOutcome2 ~ genotype, data = dataset)

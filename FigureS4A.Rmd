@@ -37,6 +37,9 @@ dataset$experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/lengt
 dataset$UID <- factor(paste(dataset$experiment, dataset$genotype))
 
 
+kable(dataset, row.names = F)
+
+
 library(reshape2)
 # reshape to long format
 dataset <- melt(dataset, variable.name = "treatment", value.name = "Outcome")
@@ -112,7 +115,7 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = treatment)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "chromatin fraction") +
-        ylim(0, 10) +
+        ylim(0, 3) +
         scale_fill_manual(values=c("#000000","#A00000","#0000A0"))
 
 
@@ -124,7 +127,7 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill=treatment)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "rel. chromatin fraction") +
-        ylim(0, 4) +
+        ylim(0, 3) +
         scale_fill_manual(values=c("#000000","#A00000","#0000A0"))
 
 dev.off()
@@ -143,9 +146,9 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill=treatment)) +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
         ylab(label = "rel. chromatin fraction") +
-        ylim(0, 4) +
+        ylim(0, 3) +
         scale_fill_manual(values=c("#00000080","#A0000080","#0000A080")) +
-        geom_jitter(data = dataset, cex=1, position=position_dodge(0.9),  aes(colour=genotype)) +
+        geom_jitter(data = dataset, cex=1, position=position_dodge(0.9),  aes(colour=treatment)) +
         scale_color_manual(values=c("#000000","#A00000","#0000A0")) +
         geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9))
 
@@ -162,7 +165,7 @@ ggplot(dataset, aes(x=genotype, y=NormOutcome2, color=treatment)) +
         stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=treatment), position=position_dodge(1)) +
         stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=treatment), position=position_dodge(1)) +
         ylab(label = "rel. chromatin fraction") +
-        ylim(0, 4) +
+        ylim(0, 3) +
         scale_color_manual(values=c("#000000","#A00000","#0000A0")) 
 
 
@@ -236,7 +239,7 @@ write.table(output, file = "FigureS4A_Stats_Ref_WT.txt", quote = F, sep = "\t", 
 ```
 
 ```{r, fig.height=5, fig.width=18}
-# re-fit with ALC1KO reference
+# re-fit with siALC1 reference
 dataset$genotype <- relevel(dataset$genotype, ref = "siALC1")
 
 fit <- lm(NormOutcome2 ~ treatment*genotype, data = dataset)
@@ -259,6 +262,33 @@ rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], 
 kable(output, row.names = T)
 
 write.table(output, file = "FigureS4A_Stats_Ref_ALC1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+```{r, fig.height=5, fig.width=18}
+# re-fit with BRCA1 reference
+dataset$genotype <- relevel(dataset$genotype, ref = "siBRCA1")
+
+fit <- lm(NormOutcome2 ~ treatment*genotype, data = dataset)
+
+
+output <- coef(summary(fit))
+output <- output[grep("treatment|genotype", rownames(output)),]
+
+rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$treatment)[1])
+
+rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$genotype)[1])
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "FigureS4A_Stats_Ref_BRCA1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
 

@@ -31,7 +31,7 @@ library(knitr)
 library(gdata)
 dataset <- read.delim("raw_data/Figure2B.txt", stringsAsFactors = FALSE)
 
-dataset$y <- dataset$breaks.per.chromosome.spread
+dataset$Outcome <- dataset$breaks.per.chromosome.spread
 
 dataset$group <- factor(gsub(" ", "", dataset$genotype))
 dataset$treatment <- factor(gsub(".*\\+", "", dataset$group))
@@ -54,25 +54,24 @@ kable(dataset, row.names = F)
 library(ggplot2)
 
 
-ggplot(dataset, aes(x=group, y=y)) + 
+ggplot(dataset, aes(x=group, y=Outcome)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14), axis.text.x = element_text(angle = 90, hjust = 1)) +
-        geom_smooth(method=lm, formula = y ~ poly(x,2), se=FALSE, aes(colour=genotype)) +
         geom_point(aes(colour=genotype, shape=experiment), size=2) +        
         scale_shape_manual(values=15:20) +
         scale_color_manual(values=c("#000000","#000080","#808080","#800000"))
 
 
 
-dataplot <- aggregate(y ~ genotype+treatment, data = dataset, mean)
-dataplot$se <- aggregate(y ~ genotype+treatment, data = dataset, FUN = function(x){ sd(x)/sqrt(length(x))  })$y
+dataplot <- aggregate(Outcome ~ genotype+treatment, data = dataset, mean)
+dataplot$se <- aggregate(Outcome ~ genotype+treatment, data = dataset, FUN = function(x){ sd(x)/sqrt(length(x))  })$Outcome
 
 
-ggplot(dataplot, aes(x=treatment, y=y, fill = genotype)) + 
+ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge()) +
-        geom_errorbar(aes(ymin=y-se, ymax=y+se),width=.2, position=position_dodge(.9)) +
+        geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "Breaks per chromosome spread") +
         ylim(0, 3) +
         scale_fill_manual(values=c("#000000","#0000A0"))
@@ -80,11 +79,11 @@ ggplot(dataplot, aes(x=treatment, y=y, fill = genotype)) +
 
 pdf("Figure2B_v1.pdf", width = 5, height = 4)
 
-ggplot(dataplot, aes(x=treatment, y=y, fill = genotype)) + 
+ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge()) +
-        geom_errorbar(aes(ymin=y-se, ymax=y+se),width=.2, position=position_dodge(.9)) +
+        geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "Breaks per chromosome spread") +
         ylim(0, 3) +
         scale_fill_manual(values=c("#000000","#0000A0"))
@@ -99,7 +98,7 @@ library(Cairo)
 
 cairo_pdf("Figure2B_v2.pdf", width = 5, height = 4)
 
-ggplot(dataplot, aes(x=treatment, y=y, fill = genotype)) + 
+ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
@@ -108,7 +107,7 @@ ggplot(dataplot, aes(x=treatment, y=y, fill = genotype)) +
         scale_fill_manual(values=c("#00000080","#0000A080")) +
         geom_jitter(data = dataset, cex=1, position=position_dodge(0.9),  aes(colour=genotype)) +
         scale_color_manual(values=c("#000000","#0000A0")) +
-        geom_errorbar(aes(ymin=y-se, ymax=y+se),width=.2, position=position_dodge(.9))
+        geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9))
 
 
 dev.off()
@@ -116,7 +115,7 @@ dev.off()
 
 cairo_pdf("Figure2B_v3.pdf", width = 5, height = 4)
 
-ggplot(dataset, aes(x=treatment, y=y, color=genotype)) + 
+ggplot(dataset, aes(x=treatment, y=Outcome, color=genotype)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) + 
         geom_jitter(cex=1, position=position_dodge(1)) + 
@@ -149,7 +148,7 @@ library(bbmle)
 
 
 ```{r}
-fit1 <- lm(y ~ experiment + treatment*genotype, data = dataset)
+fit1 <- lm(Outcome ~ experiment + treatment*genotype, data = dataset)
 print(summary(fit1))
 cat("AIC: ", AIC(fit1))
 
@@ -158,7 +157,7 @@ plot(simres)
 ```
 
 ```{r}
-fit2 <- lmer(y ~ treatment*genotype + (1|experiment), data = dataset)
+fit2 <- lmer(Outcome ~ treatment*genotype + (1|experiment), data = dataset)
 print(summary(fit2))
 cat("AIC: ", AIC(fit2))
 
@@ -196,14 +195,14 @@ rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], 
 # suggested result table
 kable(output, row.names = T)
 
-write.table(output, file = "Figure2B_Stats_Ref_WT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+write.table(output, file = "Figure2B_Stats_Ref_WT_NT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
 ```{r, fig.height=5, fig.width=18}
 # re-fit with ALC1KO reference
 dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO")
 
-fit <- lm(y ~ experiment + treatment*genotype, data = dataset)
+fit <- lm(Outcome ~ experiment + treatment*genotype, data = dataset)
 
 output <- coef(summary(fit))
 output <- output[grep("treatment|genotype", rownames(output)),]
@@ -221,17 +220,41 @@ rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], 
 # suggested result table
 kable(output, row.names = T)
 
-write.table(output, file = "Figure2B_Stats_Ref_ALC1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+write.table(output, file = "Figure2B_Stats_Ref_ALC1_NT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
+```{r, fig.height=5, fig.width=18}
+# re-fit with Olaparib reference
+dataset$genotype <- relevel(dataset$genotype, ref = "WT")
+dataset$treatment <- relevel(dataset$treatment, ref = "Olaparib")
 
+fit <- lm(Outcome ~ experiment + treatment*genotype, data = dataset)
+
+output <- coef(summary(fit))
+output <- output[grep("treatment|genotype", rownames(output)),]
+
+rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$treatment)[1])
+
+rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$genotype)[1])
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure2B_Stats_Ref_WT_Olaparib.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
 
 ## ANOVA
 
 
 ```{r}
-fit1a <- lm(y ~ experiment + treatment*genotype, data = dataset)
-fit1b <- lm(y ~ experiment + treatment+genotype, data = dataset)
+fit1a <- lm(Outcome ~ experiment + treatment*genotype, data = dataset)
+fit1b <- lm(Outcome ~ experiment + treatment+genotype, data = dataset)
 
 anova(fit1a, fit1b)
 

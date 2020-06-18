@@ -100,7 +100,7 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
-        ylab(label = paste0("Relative ",expression("\u03B3"),"H2AX intensity")) +
+        ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
         xlab(label = "Time post 2 Gy irradiation") +
         ylim(0, 70) +
         scale_fill_manual(values=c("#000000","#800000","#000080","#808080"))
@@ -113,7 +113,7 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
-        ylab(label = paste0("Relative ",expression("\u03B3"),"H2AX intensity")) +
+        ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
         xlab(label = "Time post 2 Gy irradiation (h)") +
         ylim(0, 70) +
         scale_fill_manual(values=c("#000000","#800000","#000080","#808080"))
@@ -131,7 +131,7 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
-        ylab(label = paste0("Relative ",expression("\u03B3"),"H2AX intensity")) +
+        ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
         xlab(label = "Time post 2 Gy irradiation (h)") +
         ylim(0, 70) +
         scale_fill_manual(values=c("#00000080","#80000080","#00008080","#80808080")) +
@@ -147,7 +147,7 @@ ggplot(dataset, aes(x=treatment, y=Outcome, color=genotype)) +
         geom_jitter(cex=1, position=position_dodge(1)) +
         stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=genotype), position=position_dodge(1)) +
         stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=genotype), position=position_dodge(1)) +
-        ylab(label = paste0("Relative ",expression("\u03B3"),"H2AX intensity")) +
+        ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
         xlab(label = "Time post 2 Gy irradiation (h)") +
         ylim(0, 70) +
         scale_fill_manual(values=c("#00000080","#80000080","#00008080","#80808080")) +

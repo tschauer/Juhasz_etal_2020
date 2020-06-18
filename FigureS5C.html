@@ -389,7 +389,80 @@ colnames(dataset) &lt;- gsub(&quot;HR.&quot;,&quot;Outcome&quot;, colnames(datas
 dataset$genotype &lt;- factor(gsub(&quot; &quot;,&quot;&quot;,dataset$genotype), levels = c(&quot;siCtrl&quot;, &quot;siBRCA1&quot;, &quot;siKu70&quot;, &quot;siALC1&quot;))
 dataset$experiment &lt;- factor(rep(paste0(&quot;exp&quot;, 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each= length(levels(dataset$genotype))))
 
-dataset$Offset &lt;- NA
+
+kable(dataset, row.names = F)</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">genotype</th>
+<th align="right">Outcome</th>
+<th align="left">experiment</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">0.4213612</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">0.2651307</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">0.8595453</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">0.2258382</td>
+<td align="left">exp1</td>
+</tr>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">1.0705641</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">0.2382621</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">1.6241299</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">0.7803790</td>
+<td align="left">exp2</td>
+</tr>
+<tr class="odd">
+<td align="left">siCtrl</td>
+<td align="right">0.8923304</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="even">
+<td align="left">siBRCA1</td>
+<td align="right">0.2680506</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="odd">
+<td align="left">siKu70</td>
+<td align="right">1.0398230</td>
+<td align="left">exp3</td>
+</tr>
+<tr class="even">
+<td align="left">siALC1</td>
+<td align="right">0.3985600</td>
+<td align="left">exp3</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>dataset$Offset &lt;- NA
 for(eid in levels(dataset$experiment)){
         dataset$Offset[dataset$experiment == eid] &lt;- mean(dataset$Outcome[dataset$experiment == eid])
 }
@@ -753,14 +826,14 @@ kable(output, row.names = T)</code></pre>
 </tr>
 </tbody>
 </table>
-<pre class="r"><code>write.table(output, file = &quot;FigureS5C_Stats_Ref_WT.txt&quot;, quote = F, sep = &quot;\t&quot;, row.names = T, col.names = NA)</code></pre>
-<pre class="r"><code># re-fit with ALC1KO reference
+<pre class="r"><code>write.table(output, file = &quot;FigureS5C_Stats_Ref_siCtrl.txt&quot;, quote = F, sep = &quot;\t&quot;, row.names = T, col.names = NA)</code></pre>
+<pre class="r"><code># re-fit with siALC1 reference
 dataset$genotype &lt;- relevel(dataset$genotype, ref = &quot;siALC1&quot;)
 
 fit &lt;- lm(NormOutcome2 ~ genotype, data = dataset)
 
 output &lt;- coef(summary(fit))
-output &lt;- output[grep(&quot; genotype&quot;, rownames(output)),]
+output &lt;- output[grep(&quot;genotype&quot;, rownames(output)),]
 
 rownames(output) &lt;- gsub(&quot;genotype&quot;,   paste0(&quot; &quot;,levels(dataset$genotype)[1], &quot; vs. &quot;), rownames(output))
 
@@ -770,7 +843,7 @@ kable(output, row.names = T)</code></pre>
 <table>
 <thead>
 <tr class="header">
-<th align="left"></th>
+<th></th>
 <th align="right">Estimate</th>
 <th align="right">Std. Error</th>
 <th align="right">t value</th>
@@ -778,6 +851,27 @@ kable(output, row.names = T)</code></pre>
 </tr>
 </thead>
 <tbody>
+<tr class="odd">
+<td>siALC1 vs. siCtrl</td>
+<td align="right">0.4353165</td>
+<td align="right">0.1277285</td>
+<td align="right">3.408139</td>
+<td align="right">0.0092485</td>
+</tr>
+<tr class="even">
+<td>siALC1 vs. siBRCA1</td>
+<td align="right">-0.2001622</td>
+<td align="right">0.1277285</td>
+<td align="right">-1.567091</td>
+<td align="right">0.1557285</td>
+</tr>
+<tr class="odd">
+<td>siALC1 vs. siKu70</td>
+<td align="right">0.9564696</td>
+<td align="right">0.1277285</td>
+<td align="right">7.488302</td>
+<td align="right">0.0000700</td>
+</tr>
 </tbody>
 </table>
 <pre class="r"><code>write.table(output, file = &quot;FigureS5C_Stats_Ref_siALC1.txt&quot;, quote = F, sep = &quot;\t&quot;, row.names = T, col.names = NA)</code></pre>
