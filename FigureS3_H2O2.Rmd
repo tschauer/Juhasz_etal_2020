@@ -28,7 +28,7 @@ library(knitr)
 
 
 ```{r}
-dataset <- read.delim("raw_data/SFigure3_H2O2.txt", stringsAsFactors = FALSE)
+dataset <- read.delim("raw_data/FigureS3_H2O2.txt", stringsAsFactors = FALSE)
 
 dataset$genotype <- gsub(" ", "", dataset$genotype )
 dataset$genotype <- factor(dataset$genotype)
@@ -168,11 +168,16 @@ ggplot(dataset, aes(x=H2O2, y=NormCounts2, color=siRNA)) +
         scale_color_manual(values=c("#000000","#FF0000"))
 
 
-pdf("FigureS3_H2O2.pdf", width = 5, height = 4)
+library(Cairo)
+
+
+cairo_pdf("FigureS3_H2O2.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=H2O2, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = siRNA, shape = genotype), size=1.75) +
         geom_smooth(method=lm, formula = y ~ poly(x,2), se=TRUE, 
                     aes(group = GSID,colour = siRNA, linetype = genotype), fill='#DDDDDD', size=0.5) +
@@ -183,6 +188,7 @@ ggplot(dataset, aes(x=H2O2, y=NormCounts2)) +
         guides(linetype = guide_legend(override.aes= list(color = "#555555"))) 
 
 dev.off()
+
 ```
 
 
@@ -402,15 +408,6 @@ fit11d <- lm(NormCounts2 ~ poly(H2O2,3)*genotype+siRNA, data = dataset)
 # anova table
 anova(fit11c, fit11d)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
 
 
 

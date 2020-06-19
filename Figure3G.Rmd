@@ -107,11 +107,13 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
 
 library(Cairo)
 
-cairo_pdf("Figure3G_v1.pdf", width = 7, height = 4)
+cairo_pdf("Figure3G_v1.pdf", width = 7, height = 4, family = "Arial")
 
 ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
         ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
@@ -128,11 +130,13 @@ dataset$treatment <- relevel(dataset$treatment, ref = "NT")
 
 
 
-cairo_pdf("Figure3G_v2.pdf", width = 7, height = 4)
+cairo_pdf("Figure3G_v2.pdf", width = 7, height = 4, family = "Arial")
 
 ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
         ylab(label = paste0(expression("\u03B3"),"H2AX foci per cell")) +
         xlab(label = "Time post 2 Gy irradiation (h)") +
@@ -143,11 +147,13 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) 
 
 
-cairo_pdf("Figure3G_v3.pdf", width = 7, height = 4)
+cairo_pdf("Figure3G_v3.pdf", width = 7, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=treatment, y=Outcome, color=genotype)) +
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_jitter(cex=1, position=position_dodge(1)) +
         stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=genotype), position=position_dodge(1)) +
         stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=genotype), position=position_dodge(1)) +

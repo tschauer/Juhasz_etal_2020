@@ -78,11 +78,15 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         scale_fill_manual(values=c("#000000","#0000A0"))
 
 
-pdf("Figure4A_v1.pdf", width = 5, height = 4)
+library(Cairo)
+
+cairo_pdf("Figure4A_v1.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=Outcome-se, ymax=Outcome+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "chromatin fraction") +
@@ -93,13 +97,14 @@ dev.off()
 
 
 
-library(Cairo)
 
-cairo_pdf("Figure4A_v2.pdf", width = 5, height = 4)
+cairo_pdf("Figure4A_v2.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
         ylab(label = "chromatin fraction") +
         ylim(0, 100) +
@@ -112,11 +117,13 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
 dev.off()
 
 
-cairo_pdf("Figure4A_v3.pdf", width = 5, height = 4)
+cairo_pdf("Figure4A_v3.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=treatment, y=Outcome, color=genotype)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) + 
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_jitter(cex=1, position=position_dodge(1)) + 
         stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=genotype), position=position_dodge(1)) +
         stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=genotype), position=position_dodge(1)) +

@@ -167,25 +167,16 @@ ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=BRCA)) +
         scale_color_manual(values=c("#000000","#FF0000"))
 
 
-pdf("Figure5G.pdf", width = 8, height = 4)
+library(Cairo)
+
+
+cairo_pdf("Figure5G.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour = BRCA)) +
-        geom_smooth(method=lm, formula = y ~ poly(x,3), se=TRUE, aes(colour = BRCA), fill='#CCCCCC') +
-        facet_grid(. ~ Alc1) +
-        xlab(label = "Olaparib (log10 nM)") +
-        ylab(label = "Normalized Counts") +
-        scale_color_manual(values=c("#000000","#FF0000"))
-
-dev.off()
-
-pdf("Figure5G.pdf", width = 5, height = 4)
-
-ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
-        theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = BRCA, shape = Alc1), size=1.75) +
         geom_smooth(method=lm, formula = y ~ poly(x,3), se=TRUE, 
                     aes(group = GSID,colour = BRCA, linetype = Alc1), fill='#DDDDDD', size=0.5) +
@@ -412,15 +403,5 @@ fit11d <- lm(NormCounts2 ~ poly(Olaparib,3)*Alc1+BRCA, data = dataset)
 # anova table
 anova(fit11c, fit11d)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
-
 
 

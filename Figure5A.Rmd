@@ -170,7 +170,9 @@ ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=siRNA)) +
         scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
 
 
-pdf("Figure5A.pdf", width = 8, height = 4)
+library(Cairo)
+
+cairo_pdf("Figure5A.pdf", width = 8, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
         theme_bw() +
@@ -390,15 +392,6 @@ fit7b <- lm(NormCounts2 ~ poly(Olaparib,2)*siRNA+genotype, data = dataset)
 # anova table
 anova(fit7a, fit7b)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
 
 
 

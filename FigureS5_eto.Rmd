@@ -28,7 +28,7 @@ library(knitr)
 
 
 ```{r}
-dataset <- read.delim("raw_data/SFigure5_eto.txt", stringsAsFactors = FALSE)
+dataset <- read.delim("raw_data/FigureS5_eto.txt", stringsAsFactors = FALSE)
 
 dataset$genotype <- gsub(" ", "", dataset$genotype )
 dataset$genotype <- factor(dataset$genotype)
@@ -162,11 +162,15 @@ ggplot(dataset, aes(x=Etoposide, y=NormCounts2, color=genotype)) +
         scale_color_manual(values=c("#000000","#808000"))
 
 
-pdf("FigureS5_eto.pdf", width = 5, height = 4)
+library(Cairo)
+
+cairo_pdf("FigureS5_eto.pdf", width = 5, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=Etoposide, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = genotype)) +
         geom_smooth(method=lm, formula = y ~ poly(x,2), se=TRUE, aes(colour = genotype), fill='#CCCCCC') +
         #facet_grid(. ~ genotype) +
@@ -175,6 +179,7 @@ ggplot(dataset, aes(x=Etoposide, y=NormCounts2)) +
         scale_color_manual(values=c("#000000","#808000"))
 
 dev.off()
+
 ```
 
 
@@ -352,15 +357,6 @@ fit7b <- lm(NormCounts2 ~ poly(Etoposide,2)+genotype, data = dataset)
 # anova table
 anova(fit7a, fit7b)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
 
 
 

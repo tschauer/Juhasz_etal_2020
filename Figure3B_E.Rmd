@@ -177,7 +177,7 @@ ggplot(dataset, aes(x=MMS, y=NormCounts2, color=Treatment)) +
 
 
  
-pdf("Figure3B_E.pdf", width = 10, height = 4)
+cairo_pdf("Figure3B_E.pdf", width = 10, height = 4, family = "Arial")
 datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype),]
 datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
 
@@ -433,15 +433,6 @@ fit3b <- lm(NormCounts2 ~ MMS*Olaparib+genotype, data = dataset)
 # anova table
 anova(fit3a, fit3b)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
 
 
 

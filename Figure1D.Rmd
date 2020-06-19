@@ -156,14 +156,18 @@ ggplot(dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,6,7)],], aes
         xlab(label = "Olaparib (log10 nM)") 
 
 
+library(Cairo)
 
-pdf("Figure1D.pdf", width = 10, height = 4)
+cairo_pdf("Figure1D_v1.pdf", width = 10, height = 4, family = "Arial")
+
 datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,6,7)],]
 datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
 
 ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = genotype)) +
         geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
         facet_grid(. ~ genotype) +
@@ -173,21 +177,24 @@ ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) +
 
 dev.off()
 
-# pdf("Figure1Dv2.pdf", width = 10, height = 4)
-# datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,6,7)],]
-# datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
-# 
-# ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
-#         theme_bw() +
-#         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-#         geom_point(aes(colour = genotype)) +
-#         geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, aes(colour = genotype), fill='#CCCCCC') +
-#         facet_grid(. ~ genotype) +
-#         xlab(label = "Olaparib (log10 nM)") +
-#         ylab(label = "Normalized Counts") +
-#         scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
-# 
-# dev.off()
+
+
+cairo_pdf("Figure1D_v2.pdf", width = 5, height = 4, family = "Arial")
+
+ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_point(aes(colour = genotype), size=1.75) +
+        geom_smooth(method=lm, formula = y ~ poly(x,2), se=TRUE, 
+                    aes(group = genotype, colour = genotype), fill='#DDDDDD', size=0.5) +
+        #facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") +
+        ylab(label = "Normalized Counts") +
+        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+
+dev.off()
 ```
 
 
@@ -195,7 +202,6 @@ dev.off()
 
 
 ```{r}
-library(MASS)
 library(DHARMa)
 library(lme4)
 library(lmerTest)
@@ -387,15 +393,5 @@ fit7b <- lm(NormCounts2 ~ poly(Olaparib, 2)+genotype, data = dataset)
 # anova table
 anova(fit7a, fit7b)
 ```
-
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
-
 
 

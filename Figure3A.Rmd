@@ -154,14 +154,18 @@ ggplot(dataset[dataset$genotype %in% levels(dataset$genotype),], aes(x=MMS, y=No
         facet_grid(. ~ genotype) +
         xlab(label = "MMS (%)") 
 
+library(Cairo)
 
-pdf("Figure3A.pdf", width = 10, height = 4)
+cairo_pdf("Figure3A_v1.pdf", width = 10, height = 4, family = "Arial")
 datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype),]
 datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
 
 ggplot(datasubset, aes(x=MMS, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank(),
+              axis.text.x = element_text(angle = 90, hjust = 1)) +
         geom_point(aes(colour = genotype)) +
         geom_smooth(method=lm, formula = y ~ x, se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
         facet_grid(. ~ genotype) +
@@ -171,6 +175,31 @@ ggplot(datasubset, aes(x=MMS, y=NormCounts2)) +
         scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
 
 dev.off()
+
+
+cairo_pdf("Figure3A_v2.pdf", width = 5, height = 4, family = "Arial")
+datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype),]
+datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
+
+ggplot(datasubset, aes(x=MMS, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank(),
+              axis.text.x = element_text(angle = 90, hjust = 1)) +
+        geom_point(aes(colour = genotype)) +
+        geom_smooth(method=lm, formula = y ~ x, se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
+        #facet_grid(. ~ genotype) +
+        xlab(label = "MMS (%)") +
+        ylab(label = "Normalized Counts") +
+        scale_x_continuous(labels = function(x) format(x, scientific = TRUE)) +
+        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+
+dev.off()
+
+
+
+
 ```
 
 
@@ -370,14 +399,4 @@ fit3b <- lm(NormCounts2 ~ MMS+genotype, data = dataset)
 # anova table
 anova(fit3a, fit3b)
 ```
-
-# Links
-
-* https://bioconductor.org/packages/release/bioc/vignettes/CFAssay/inst/doc/cfassay.pdf
-* http://www.flutterbys.com.au/stats/course.html
-* https://bookdown.org/roback/bookdown-bysh/
-* https://cran.r-project.org/web/packages/DHARMa/vignettes/DHARMa.html
-* https://en.wikipedia.org/wiki/Akaike_information_criterion
-
-
 
