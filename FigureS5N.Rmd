@@ -1,0 +1,259 @@
+---
+title: "FigureS5N"
+output: html_document
+---
+
+
+<style>
+pre {
+  overflow-x: auto;
+}
+pre code {
+  word-wrap: normal;
+  white-space: pre;
+}
+.table{
+  width:auto;
+  font-size: 10px;
+}
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning=FALSE, results=TRUE, fig.align='center', fig.height=5, fig.width=8)
+library(knitr)
+```
+
+
+## Load Data
+
+
+```{r}
+library(gdata)
+dataset <- read.delim("raw_data/FigureS5N.txt", stringsAsFactors = FALSE)
+
+colnames(dataset) <- gsub("NHEJ.","Outcome", colnames(dataset))
+
+dataset$genotype <- factor(gsub(" ","",dataset$genotype), levels = c("mCherry", "mCherry-ALC1"))
+dataset$experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each= length(levels(dataset$genotype))))
+
+
+kable(dataset, row.names = F)
+
+
+dataset$Offset <- NA
+for(eid in levels(dataset$experiment)){
+        dataset$Offset[dataset$experiment == eid] <- mean(dataset$Outcome[dataset$experiment == eid])
+}
+
+dataset$NormOutcome <- dataset$Outcome / dataset$Offset
+
+dataset$Offset2 <- NA
+for(gid in levels(dataset$genotype)){
+        dataset$Offset2[dataset$genotype == gid] <- mean(dataset$NormOutcome[dataset$genotype == "mCherry"])
+
+}
+
+dataset$NormOutcome2 <- dataset$NormOutcome / dataset$Offset2
+
+
+kable(dataset, row.names = F)
+```
+
+
+## Plot Data
+
+
+```{r, fig.height=5, fig.width=6}
+library(ggplot2)
+
+# raw data
+ggplot(dataset, aes(x=genotype, y=Outcome)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        geom_point(aes(colour=genotype, shape=experiment), size=2) +        
+        scale_shape_manual(values=15:20) +
+        scale_color_manual(values=c("#000000","#808000","#808080","#000080"))
+
+# norm data
+ggplot(dataset, aes(x=genotype, y=NormOutcome)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        geom_point(aes(colour=genotype, shape=experiment), size=2) +        
+        scale_shape_manual(values=15:20) +
+        scale_color_manual(values=c("#000000","#808000","#808080","#000080"))
+
+# norm2 data
+ggplot(dataset, aes(x=genotype, y=NormOutcome2)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14), axis.text.x = element_text(angle = 90, hjust = 1)) +
+        geom_point(aes(colour=genotype, shape=experiment), size=2) +        
+        scale_shape_manual(values=15:20) +
+        scale_color_manual(values=c("#000000","#808000","#808080","#000080"))
+
+
+dataplot <- aggregate(NormOutcome2 ~ genotype, data = dataset, mean)
+dataplot$se <- aggregate(NormOutcome2 ~ genotype, data = dataset, FUN = function(x){ sd(x)/sqrt(length(x))})$NormOutcome2
+
+dataplot$genotype <- factor(dataplot$genotype, levels = c("mCherry", "mCherry-ALC1"))
+
+
+ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) + 
+        theme_bw() +
+        theme(panel.grid=element_blank(), text = element_text(size=14)) +
+        geom_bar(stat="identity", position=position_dodge()) +
+        geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
+        ylab(label = "Relative number of GFP positive cells") +
+        ylim(0, 1.8) +
+        scale_fill_manual(values=c("#000000","#808000","#808080","#000080"))
+
+
+
+library(Cairo)
+
+cairo_pdf("FigureS5N_v1.pdf", width = 5, height = 4, family = "Arial")
+
+ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_bar(stat="identity", position=position_dodge()) +
+        geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
+        ylab(label = "Relative number of GFP positive cells") +
+        xlab(label = "NHEJ assay") +
+        ylim(0, 1.8) +
+        scale_fill_manual(values=c("#000000","#808000","#808080","#000080"))
+
+dev.off()
+
+
+
+cairo_pdf("FigureS5N_v2.pdf", width = 5, height = 4, family = "Arial")
+
+ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_bar(stat="identity", position=position_dodge(), colour="black") +
+        ylab(label = "Relative number of GFP positive cells") +
+        xlab(label = "NHEJ assay") +
+        ylim(0, 1.8) +
+        scale_fill_manual(values=c("#00000080","#80800080","#80808080","#00008080")) +
+        geom_jitter(data = dataset, cex=1, position=position_dodge(0.9),  aes(colour=genotype)) +
+        scale_color_manual(values=c("#000000","#808000","#808080","#000080")) +
+        geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9))
+
+
+dev.off()
+
+
+cairo_pdf("FigureS5N_v3.pdf", width = 5, height = 4, family = "Arial")
+
+ggplot(dataset, aes(x=genotype, y=NormOutcome2, color=genotype)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_jitter(cex=1, position=position_dodge(1)) + 
+        stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=genotype), position=position_dodge(1)) +
+        stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=genotype), position=position_dodge(1)) +
+        ylab(label = "Relative number of GFP positive cells") +
+        xlab(label = "NHEJ assay") +
+        ylim(0, 1.8) +
+        scale_color_manual(values=c("#000000","#808000","#808080","#000080"))
+
+
+dev.off()
+
+```
+
+
+
+## Linear Model
+
+
+```{r}
+library(MASS)
+library(DHARMa)
+library(lme4)
+library(lmerTest)
+library(bbmle)
+```
+
+
+```{r}
+fit1 <- lm(NormOutcome2 ~ genotype, data = dataset)
+print(summary(fit1))
+cat("AIC: ", AIC(fit1))
+
+simres <- simulateResiduals(fittedModel = fit1, n = 200)
+plot(simres)
+```
+
+```{r}
+fit2 <- lmer(NormOutcome2 ~ genotype + (1|experiment), data = dataset)
+print(summary(fit2))
+cat("AIC: ", AIC(fit2))
+
+simres <- simulateResiduals(fittedModel = fit2)
+plot(simres)
+```
+
+
+## Compare Results
+
+
+```{r}
+ICtab(fit1,fit2,
+      base=T)
+```
+
+## Final Result
+
+```{r, fig.height=5, fig.width=18}
+fit <- fit1
+
+output <- coef(summary(fit))
+#output <- output[grep("genotype", rownames(output)),]
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "FigureS5N_Stats_Ref_mCherry.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+```{r, fig.height=5, fig.width=18}
+# re-fit with mCherry-ALC1 reference
+dataset$genotype <- relevel(dataset$genotype, ref = "mCherry-ALC1")
+
+fit <- lm(NormOutcome2 ~ genotype, data = dataset)
+
+output <- coef(summary(fit))
+#output <- output[grep("genotype", rownames(output)),]
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "FigureS5N_Stats_Ref_mCherry-ALC1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+
+## ANOVA
+
+
+```{r}
+fit1a <- lm(NormOutcome2 ~ genotype, data = dataset)
+fit1b <- lm(NormOutcome2 ~ 1, data = dataset)
+
+anova(fit1a, fit1b)
+
+```
+

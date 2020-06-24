@@ -30,7 +30,8 @@ library(knitr)
 ```{r}
 dataset <- read.delim("raw_data/Figure1D.txt", stringsAsFactors = FALSE)
 
-dataset$genotype <-  factor(gsub(" $","",dataset$genotype))
+dataset$genotype <-  factor(gsub(" $","",dataset$genotype), levels = c("WT", "PARP1 KO", "ALC1 KO #1", "ALC1 KO #2", "ALC1 KO #3", "ALC1 KO PARP1 KO #1", "ALC1 KO PARP1 KO #2"))
+                            
 dataset$Experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each=length(unique(dataset$genotype))))
 
 # genotype+Experiment gives unique ID (UID)
@@ -160,7 +161,7 @@ library(Cairo)
 
 cairo_pdf("Figure1D_v1.pdf", width = 10, height = 4, family = "Arial")
 
-datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,6,7)],]
+datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,3,7)],]
 datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
 
 ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
@@ -173,13 +174,13 @@ ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) +
         facet_grid(. ~ genotype) +
         xlab(label = "Olaparib (log10 nM)") +
         ylab(label = "Normalized Counts") +
-        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+        scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
 dev.off()
 
 
 
-cairo_pdf("Figure1D_v2.pdf", width = 5, height = 4, family = "Arial")
+cairo_pdf("Figure1D_v2.pdf", width = 6, height = 4, family = "Arial")
 
 ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
         theme_bw() +
@@ -192,9 +193,33 @@ ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) +
         #facet_grid(. ~ genotype) +
         xlab(label = "Olaparib (log10 nM)") +
         ylab(label = "Normalized Counts") +
-        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+        scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
 dev.off()
+
+
+cairo_pdf("FigureS1C.pdf", width = 6, height = 4, family = "Arial")
+
+datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype)[c(1,2,4,5,6)],]
+datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
+
+ggplot(datasubset, aes(x=Olaparib, y=NormCounts2)) + 
+        theme_bw() +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_point(aes(colour = genotype), size=1.75) +
+        geom_smooth(method=lm, formula = y ~ poly(x,2), se=TRUE, 
+                    aes(group = genotype, colour = genotype), fill='#DDDDDD', size=0.5) +
+        #facet_grid(. ~ genotype) +
+        xlab(label = "Olaparib (log10 nM)") +
+        ylab(label = "Normalized Counts") +
+        scale_color_manual(values=c('#000000','#800000','#000080','#008080','#808080'))
+
+dev.off()
+
+
+
 ```
 
 

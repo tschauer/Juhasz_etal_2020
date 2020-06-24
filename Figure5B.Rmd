@@ -65,6 +65,7 @@ ggplot(dataset, aes(x=group, y=Outcome)) +
         scale_color_manual(values=c("#000000","#000080","#808080","#800000"))
 
 
+
 dataplot <- aggregate(Outcome ~ genotype+treatment, data = dataset, mean)
 dataplot$se <- aggregate(Outcome ~ genotype+treatment, data = dataset, FUN = function(x){ sd(x)/sqrt(length(x))})$Outcome
 
@@ -79,7 +80,6 @@ ggplot(dataplot, aes(x=treatment, y=Outcome, fill = genotype)) +
         ylab(label = "Colocalization") +
         ylim(0, 100) +
         scale_fill_manual(values=c("#000000","#800000","#000080","#808080"))
-
 
 
 library(Cairo)
@@ -102,9 +102,6 @@ dev.off()
 
 dataset$genotype <- factor(dataset$genotype, levels = c("WT","PARP1KO","ALC1KO","ALC1KOPARP1KO"))
 dataset$treatment <- relevel(dataset$treatment, ref = "NT")
-
-
-library(Cairo)
 
 
 cairo_pdf("Figure5B_v2.pdf", width = 6, height = 4, family = "Arial")
@@ -140,8 +137,6 @@ ggplot(dataset, aes(x=treatment, y=Outcome, color=genotype)) +
 
 
 dev.off()
-
-
 
 ```
 
@@ -235,6 +230,7 @@ kable(output, row.names = T)
 write.table(output, file = "Figure5B_Stats_Ref_ALC1_NT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
+
 ```{r, fig.height=5, fig.width=18}
 # re-fit with Olaparib reference
 dataset$genotype <- relevel(dataset$genotype, ref = "WT")
@@ -260,7 +256,6 @@ kable(output, row.names = T)
 
 write.table(output, file = "Figure5B_Stats_Ref_WT_Olaparib.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
-
 
 
 

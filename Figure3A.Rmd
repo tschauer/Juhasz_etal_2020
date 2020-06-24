@@ -30,7 +30,7 @@ library(knitr)
 ```{r}
 dataset <- read.delim("raw_data/Figure3A.txt", stringsAsFactors = FALSE)
 
-dataset$genotype <-  factor(gsub(" $","",dataset$genotype))
+dataset$genotype <-  factor(gsub(" $","",dataset$genotype), levels = c("WT", "PARP1 KO", "ALC1 KO", "ALC1 KO PARP1 KO"))
 dataset$Experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each=length(unique(dataset$genotype))))
 
 # genotype+Experiment gives unique ID (UID)
@@ -172,12 +172,12 @@ ggplot(datasubset, aes(x=MMS, y=NormCounts2)) +
         xlab(label = "MMS (%)") +
         ylab(label = "Normalized Counts") +
         scale_x_continuous(labels = function(x) format(x, scientific = TRUE)) +
-        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+        scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
 dev.off()
 
 
-cairo_pdf("Figure3A_v2.pdf", width = 5, height = 4, family = "Arial")
+cairo_pdf("Figure3A_v2.pdf", width = 6, height = 4, family = "Arial")
 datasubset <- dataset[dataset$genotype %in% levels(dataset$genotype),]
 datasubset$genotype <- relevel(datasubset$genotype, ref = "WT")
 
@@ -193,7 +193,7 @@ ggplot(datasubset, aes(x=MMS, y=NormCounts2)) +
         xlab(label = "MMS (%)") +
         ylab(label = "Normalized Counts") +
         scale_x_continuous(labels = function(x) format(x, scientific = TRUE)) +
-        scale_color_manual(values=c('#000000','#000080','#808080','#800000'))
+        scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
 dev.off()
 

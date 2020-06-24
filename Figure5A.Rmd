@@ -30,15 +30,15 @@ library(knitr)
 ```{r}
 dataset <- read.delim("raw_data/Figure5A.txt", stringsAsFactors = FALSE)
 
-dataset$genotype <- gsub(" ", "", dataset$genotype )
+dataset$genotype <- gsub("Δ","d",gsub(" ", "", dataset$genotype))
 dataset$genotype <- factor(dataset$genotype)
 dataset$Experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each=length(unique(dataset$genotype))))
 
-dataset$siRNA <-  factor(gsub(".*[T,O]\\+","",dataset$genotype))
-dataset$genotype <-  factor(gsub("\\+.*","",dataset$genotype))
+dataset$BRCA <-  factor(gsub("\\+.*","",dataset$genotype))
+dataset$siRNA <-  factor(gsub(".*\\+","",dataset$genotype))
 
-dataset$UID <- factor(paste(dataset$Experiment, dataset$genotype, dataset$siRNA))
-dataset$GSID <- factor(paste(dataset$genotype, dataset$siRNA))
+dataset$UID <- factor(paste(dataset$Experiment, dataset$siRNA, dataset$BRCA))
+dataset$GSID <- factor(paste(dataset$siRNA, dataset$BRCA))
 
 # wide format
 kable(dataset, row.names = F)
@@ -47,12 +47,12 @@ library(reshape2)
 # reshape to long format
 dataset <- melt(dataset, variable.name = "Treatment", value.name = "Counts")
 
-dataset$genotype <- relevel(dataset$genotype, ref = "WT")
 dataset$siRNA <- relevel(dataset$siRNA, ref = "siCtrl")
-dataset$UID <- relevel(dataset$UID, ref = "exp1 WT siCtrl")
+dataset$BRCA <- relevel(dataset$BRCA, ref = "d11/heterozyg")
+dataset$UID <- relevel(dataset$UID, ref = "exp1 siCtrl d11/heterozyg")
 
 dataset$Olaparib <- gsub("NT","1",dataset$Treatment)
-dataset$Olaparib <- gsub("olaparib_|nM","",dataset$Olaparib)
+dataset$Olaparib <- gsub("X|nM","",dataset$Olaparib)
 dataset$Olaparib <- log10(as.integer(dataset$Olaparib))
 
 
@@ -91,100 +91,102 @@ library(ggplot2)
 ggplot(dataset, aes(x=Olaparib, y=Counts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_smooth(method=lm, formula = y ~ poly(x,2), se=FALSE, aes(colour=siRNA)) +
-        geom_point(aes(colour=siRNA, shape=Experiment), size=2) +        
-        facet_grid(. ~ genotype) +
+        geom_smooth(method=lm, formula = y ~ poly(x,2), se=FALSE, aes(colour=BRCA)) +
+        geom_point(aes(colour=BRCA, shape=Experiment), size=2) +        
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)") +
-        scale_shape_manual(values=15:19) +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_shape_manual(values=15:20) +
+        scale_color_manual(values=c("#000000","#FF0000"))
 ```
 
 
 ```{r, fig.height=4, fig.width=8}
 # NormCounts Linear
-ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ x, se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)") +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_color_manual(values=c("#000000","#FF0000"))
 
 
- 
 # NormCounts2 Linear
-ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ x, se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)") +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_color_manual(values=c("#000000","#FF0000"))
 
 
 # NormCounts Quadratic
-ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ poly(x,2), se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)")+
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080")) 
-
+        scale_color_manual(values=c("#000000","#FF0000"))
 
 
 # NormCounts2 Quadratic
-ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ poly(x,2), se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)") +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_color_manual(values=c("#000000","#FF0000"))
 
 
 # NormCounts Cubic
-ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ poly(x,3), se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)")+
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080")) 
+        scale_color_manual(values=c("#000000","#FF0000"))
 
-
-
+ 
 # NormCounts2 Cubic
-ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=siRNA)) + 
+ggplot(dataset, aes(x=Olaparib, y=NormCounts2, color=BRCA)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour=siRNA), size=2) +        
+        geom_point(aes(colour=BRCA), size=2) +        
         geom_smooth(method=lm, formula = y ~ poly(x,3), se=FALSE) +
-        facet_grid(. ~ genotype) +
+        facet_grid(. ~ siRNA) +
         xlab(label = "Olaparib (log10 nM)") +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_color_manual(values=c("#000000","#FF0000"))
 
 
 library(Cairo)
 
-cairo_pdf("Figure5A.pdf", width = 8, height = 4, family = "Arial")
+
+cairo_pdf("Figure5A.pdf", width = 6, height = 4, family = "Arial")
 
 ggplot(dataset, aes(x=Olaparib, y=NormCounts2)) + 
         theme_bw() +
-        theme(panel.grid=element_blank(), text = element_text(size=14)) +
-        geom_point(aes(colour = siRNA)) +
-        geom_smooth(method=lm, formula = y ~ poly(x,2), se=TRUE, aes(colour = siRNA), fill='#DDDDDD', size=0.5) +
-        facet_grid(. ~ genotype) +
+        theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
+              axis.line = element_line(colour = "black"), text = element_text(size=14),
+              panel.border = element_blank(), panel.background = element_blank()) +
+        geom_point(aes(colour = BRCA, shape = siRNA), size=1.75) +
+        geom_smooth(method=lm, formula = y ~ poly(x,3), se=TRUE, 
+                    aes(group = GSID,colour = BRCA, linetype = siRNA), fill='#DDDDDD', size=0.5) +
         xlab(label = "Olaparib (log10 nM)") +
         ylab(label = "Normalized Counts") +
-        scale_color_manual(values=c("#000000","#008000","#808080","#008080"))
+        scale_color_manual(values=c("#000000","#FF0000")) +
+        guides(linetype = guide_legend(override.aes= list(color = "#555555"))) 
 
 dev.off()
+
 ```
 
 
@@ -202,7 +204,7 @@ library(bbmle)
 ### Linear formula
 
 ```{r}
-fit1 <- lm(Counts ~ Experiment + Olaparib*siRNA*genotype, data = dataset)
+fit1 <- lm(Counts ~ Experiment + Olaparib*BRCA*siRNA, data = dataset)
 print(summary(fit1))
 cat("AIC: ", AIC(fit1))
 
@@ -211,7 +213,7 @@ plot(simres)
 ```
 
 ```{r}
-fit2 <- lm(NormCounts ~ Olaparib*siRNA*genotype, data = dataset)
+fit2 <- lm(NormCounts ~ Olaparib*BRCA*siRNA, data = dataset)
 print(summary(fit2))
 cat("AIC: ", AIC(fit2))
 
@@ -220,7 +222,7 @@ plot(simres)
 ```
 
 ```{r}
-fit3 <- lm(NormCounts2 ~ Olaparib*siRNA*genotype, data = dataset)
+fit3 <- lm(NormCounts2 ~ Olaparib*BRCA*siRNA, data = dataset)
 print(summary(fit3))
 cat("AIC: ", AIC(fit3))
 
@@ -230,7 +232,7 @@ plot(simres)
 
 
 ```{r}
-fit4 <- lmer(Counts ~ Olaparib*siRNA*genotype + (1|UID), data = dataset)
+fit4 <- lmer(Counts ~ Olaparib*BRCA*siRNA + (1|UID), data = dataset)
 print(summary(fit4))
 cat("AIC: ", AIC(fit4))
 
@@ -243,7 +245,7 @@ plot(simres)
 ### Quadratic formula
 
 ```{r}
-fit5 <- lm(Counts ~ Experiment + poly(Olaparib,2)*siRNA*genotype, data = dataset)
+fit5 <- lm(Counts ~ Experiment + poly(Olaparib,2)*BRCA*siRNA, data = dataset)
 print(summary(fit5))
 cat("AIC: ", AIC(fit5))
 
@@ -252,7 +254,7 @@ plot(simres)
 ```
 
 ```{r}
-fit6 <- lm(NormCounts ~ poly(Olaparib,2)*siRNA*genotype, data = dataset)
+fit6 <- lm(NormCounts ~ poly(Olaparib,2)*BRCA*siRNA, data = dataset)
 print(summary(fit6))
 cat("AIC: ", AIC(fit6))
 
@@ -261,7 +263,7 @@ plot(simres)
 ```
 
 ```{r}
-fit7 <- lm(NormCounts2 ~ poly(Olaparib,2)*siRNA*genotype, data = dataset)
+fit7 <- lm(NormCounts2 ~ poly(Olaparib,2)*BRCA*siRNA, data = dataset)
 print(summary(fit7))
 cat("AIC: ", AIC(fit7))
 
@@ -271,7 +273,7 @@ plot(simres)
 
 
 ```{r}
-fit8 <- lmer(Counts ~ poly(Olaparib,2)*siRNA*genotype + (1|UID), data = dataset)
+fit8 <- lmer(Counts ~ poly(Olaparib,2)*BRCA*siRNA + (1|UID), data = dataset)
 print(summary(fit8))
 cat("AIC: ", AIC(fit8))
 
@@ -279,11 +281,10 @@ simres <- simulateResiduals(fittedModel = fit8)
 plot(simres)
 ```
 
-
 ### Cubic formula
 
 ```{r}
-fit9 <- lm(Counts ~ Experiment + poly(Olaparib,3)*siRNA*genotype, data = dataset)
+fit9 <- lm(Counts ~ Experiment + poly(Olaparib,3)*BRCA*siRNA, data = dataset)
 print(summary(fit9))
 cat("AIC: ", AIC(fit9))
 
@@ -292,7 +293,7 @@ plot(simres)
 ```
 
 ```{r}
-fit10 <- lm(NormCounts ~ poly(Olaparib,3)*siRNA*genotype, data = dataset)
+fit10 <- lm(NormCounts ~ poly(Olaparib,3)*BRCA*siRNA, data = dataset)
 print(summary(fit10))
 cat("AIC: ", AIC(fit10))
 
@@ -301,7 +302,7 @@ plot(simres)
 ```
 
 ```{r}
-fit11 <- lm(NormCounts2 ~ poly(Olaparib,3)*siRNA*genotype, data = dataset)
+fit11 <- lm(NormCounts2 ~ poly(Olaparib,3)*BRCA*siRNA, data = dataset)
 print(summary(fit11))
 cat("AIC: ", AIC(fit11))
 
@@ -311,13 +312,14 @@ plot(simres)
 
 
 ```{r}
-fit12 <- lmer(Counts ~ poly(Olaparib,3)*siRNA*genotype + (1|UID), data = dataset)
+fit12 <- lmer(Counts ~ poly(Olaparib,3)*BRCA*siRNA + (1|UID), data = dataset)
 print(summary(fit12))
 cat("AIC: ", AIC(fit12))
 
 simres <- simulateResiduals(fittedModel = fit12)
 plot(simres)
 ```
+
 
 
 # Compare Results
@@ -335,63 +337,98 @@ ICtab(fit1,fit2,fit3,fit4,
 # Final Result
 
 ```{r, fig.height=5, fig.width=18}
-fit <- fit7
+fit <- fit11
 
 output <- coef(summary(fit))
 output <- output[grep("Olaparib", rownames(output)),]
 
 rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
-rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
-rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$genotype)[1],  sep = " in " )
-
 rownames(output) <- gsub("siRNA",  paste0(" ",levels(dataset$siRNA)[1], " vs. "), rownames(output))
-rownames(output)[!(grepl("vs.*vs|in", rownames(output)))] <- paste(rownames(output)[!(grepl("vs.*vs|in", rownames(output)))], levels(dataset$siRNA)[1],  sep = " in " )
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$siRNA)[1],  sep = " in " )
 
-rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$siRNA)[1],  sep = " " )
+rownames(output) <- gsub("BRCA",  paste0(" ",levels(dataset$BRCA)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs.*vs|in", rownames(output)))] <- paste(rownames(output)[!(grepl("vs.*vs|in", rownames(output)))], levels(dataset$BRCA)[1],  sep = " in " )
+
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$BRCA)[1],  sep = " " )
+
 
 # suggested result table
 kable(output, row.names = T)
 
-write.table(output, file = "Figure5A_Stats_Ref_WT.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+write.table(output, file = "Figure5A_Stats_Ref_d11_heterozyg_siCtrl.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+```{r, fig.height=5, fig.width=18}
+dataset$BRCA <- relevel(dataset$BRCA, ref = "d11/d11")
+
+fit <- lm(NormCounts2 ~ poly(Olaparib,3)*BRCA*siRNA, data = dataset)
+
+output <- coef(summary(fit))
+output <- output[grep("Olaparib", rownames(output)),]
+
+rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
+rownames(output) <- gsub("siRNA",  paste0(" ",levels(dataset$siRNA)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$siRNA)[1],  sep = " in " )
+
+rownames(output) <- gsub("BRCA",  paste0(" ",levels(dataset$BRCA)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs.*vs|in", rownames(output)))] <- paste(rownames(output)[!(grepl("vs.*vs|in", rownames(output)))], levels(dataset$BRCA)[1],  sep = " in " )
+
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$BRCA)[1],  sep = " " )
+
+
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure5A_Stats_Ref_d11_d11_siCtrl.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
 
 ```{r, fig.height=5, fig.width=18}
-# re-fit with ALC1KO reference
-dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO")
- 
-fit <- lm(NormCounts2 ~ poly(Olaparib,2)*siRNA*genotype, data = dataset)
+dataset$BRCA <- relevel(dataset$BRCA, ref = "d11/heterozyg")
+dataset$siRNA <- relevel(dataset$siRNA, ref = "siALC1")
+
+fit <- lm(NormCounts2 ~ poly(Olaparib,3)*BRCA*siRNA, data = dataset)
 
 output <- coef(summary(fit))
 output <- output[grep("Olaparib", rownames(output)),]
 
 rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
-rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
-rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$genotype)[1],  sep = " in " )
-
 rownames(output) <- gsub("siRNA",  paste0(" ",levels(dataset$siRNA)[1], " vs. "), rownames(output))
-rownames(output)[!(grepl("vs.*vs|in", rownames(output)))] <- paste(rownames(output)[!(grepl("vs.*vs|in", rownames(output)))], levels(dataset$siRNA)[1],  sep = " in " )
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$siRNA)[1],  sep = " in " )
 
-rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$siRNA)[1],  sep = " " )
+rownames(output) <- gsub("BRCA",  paste0(" ",levels(dataset$BRCA)[1], " vs. "), rownames(output))
+rownames(output)[!(grepl("vs.*vs|in", rownames(output)))] <- paste(rownames(output)[!(grepl("vs.*vs|in", rownames(output)))], levels(dataset$BRCA)[1],  sep = " in " )
+
+rownames(output)[!(grepl("vs", rownames(output)))] <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$BRCA)[1],  sep = " " )
+
+
 
 
 # suggested result table
 kable(output, row.names = T)
 
-write.table(output, file = "Figure5A_Stats_Ref_ALC1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+write.table(output, file = "Figure5A_Stats_Ref_d11_heterozyg_siALC1.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
-
-
 
 # Anova
 
 ```{r}
-fit7a <- lm(NormCounts2 ~ poly(Olaparib,2)*siRNA*genotype, data = dataset)
-fit7b <- lm(NormCounts2 ~ poly(Olaparib,2)*siRNA+genotype, data = dataset)
+fit11a <- lm(NormCounts2 ~ poly(Olaparib,3)*BRCA*siRNA, data = dataset)
+fit11b <- lm(NormCounts2 ~ poly(Olaparib,3)*BRCA+siRNA, data = dataset)
 
 # anova table
-anova(fit7a, fit7b)
+anova(fit11a, fit11b)
 ```
 
+
+```{r}
+fit11c <- lm(NormCounts2 ~ poly(Olaparib,3)*siRNA*BRCA, data = dataset)
+fit11d <- lm(NormCounts2 ~ poly(Olaparib,3)*siRNA+BRCA, data = dataset)
+
+# anova table
+anova(fit11c, fit11d)
+```
 
 
