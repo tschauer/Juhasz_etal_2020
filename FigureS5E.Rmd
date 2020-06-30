@@ -31,7 +31,7 @@ library(knitr)
 library(gdata)
 dataset <- read.delim("raw_data/FigureS5E.txt", stringsAsFactors = FALSE)
 
-colnames(dataset) <- gsub("NHEJ.","Outcome", colnames(dataset))
+colnames(dataset) <- gsub("HR.","Outcome", colnames(dataset))
 
 dataset$genotype <- factor(gsub(" ","",dataset$genotype), levels = c("siCtrl", "siBRCA1", "siKu70", "siALC1"))
 dataset$experiment <- factor(rep(paste0("exp", 1:(length(dataset$genotype)/length(levels(dataset$genotype)))), each= length(levels(dataset$genotype))))
@@ -103,9 +103,8 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "Relative number of GFP positive cells") +
-        ylim(0, 1.6) +
+        ylim(0, 1.8) +
         scale_fill_manual(values=c("#000000","#008080","#808080","#000080"))
-
 
 
 library(Cairo)
@@ -121,12 +120,11 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) +
         geom_bar(stat="identity", position=position_dodge()) +
         geom_errorbar(aes(ymin=NormOutcome2-se, ymax=NormOutcome2+se),width=.2, position=position_dodge(.9)) +
         ylab(label = "Relative number of GFP positive cells") +
-        xlab(label = "NHEJ assay") +
-        ylim(0, 1.6) +
+        xlab(label = "HR assay") +
+        ylim(0, 1.8) +
         scale_fill_manual(values=c("#000000","#008080","#808080","#000080"))
 
 dev.off()
-
 
 
 cairo_pdf("FigureS5E_v2.pdf", width = 5, height = 4, family = "Arial")
@@ -138,8 +136,8 @@ ggplot(dataplot, aes(x=genotype, y=NormOutcome2, fill = genotype)) +
               panel.border = element_blank(), panel.background = element_blank()) +
         geom_bar(stat="identity", position=position_dodge(), colour="black") +
         ylab(label = "Relative number of GFP positive cells") +
-        xlab(label = "NHEJ assay") +
-        ylim(0, 1.6) +
+        xlab(label = "HR assay") +
+        ylim(0, 1.8) +
         scale_fill_manual(values=c("#00000080","#00808080","#80808080","#00008080")) +
         geom_jitter(data = dataset, cex=1, position=position_dodge(0.9),  aes(colour=genotype)) +
         scale_color_manual(values=c("#000000","#008080","#808080","#000080")) +
@@ -160,8 +158,8 @@ ggplot(dataset, aes(x=genotype, y=NormOutcome2, color=genotype)) +
         stat_summary(fun.data=mean_se, fun.args = list(mult=1), geom="errorbar", width=0.25, aes(colour=genotype), position=position_dodge(1)) +
         stat_summary(fun.y=mean, geom="crossbar", width=0.5, aes(colour=genotype), position=position_dodge(1)) +
         ylab(label = "Relative number of GFP positive cells") +
-        xlab(label = "NHEJ assay") +
-        ylim(0, 1.6) +
+        xlab(label = "HR assay") +
+        ylim(0, 1.8) +
         scale_color_manual(values=c("#000000","#008080","#808080","#000080"))
 
 
