@@ -432,3 +432,65 @@ anova(fit11c, fit11d)
 ```
 
 
+
+
+## New analysis
+
+* fit model for groups (BRCA+siRNA)
+
+```{r}
+dataset$GSID <- factor(dataset$GSID, levels = unique(dataset$GSID))
+
+GSID_levels <- levels(dataset$GSID)
+
+for(g in seq_along(GSID_levels)){
+        
+        cat("Group: ", GSID_levels[g], "\n")
+        
+        dataset$GSID <- factor(dataset$GSID, levels = unique(dataset$GSID))
+        dataset$GSID <- relevel(dataset$GSID, ref = GSID_levels[g])
+        
+        fit_group <- lm(NormCounts2 ~ poly(Olaparib,3)*GSID, data = dataset)
+        
+        print(summary(fit_group))
+        cat("AIC: ", AIC(fit_group))
+        
+        
+        simres <- simulateResiduals(fittedModel = fit_group)
+        plot(simres)
+        
+        if(g == 1){
+                output <- coef(summary(fit_group))
+                output <- output[grep("Olaparib", rownames(output)),]
+                rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output))
+                
+                rownames(output) <- gsub("GSID",  paste0(" ",GSID_levels[g], " vs. "), rownames(output))
+                rownames(output)[!(grepl("vs", rownames(output)))]  <- paste(rownames(output)[!(grepl("vs", rownames(output)))], levels(dataset$GSID)[1],  sep = " in " )
+
+                
+        } else {
+                outtmp <- coef(summary(fit_group))
+                outtmp <- outtmp[grep("Olaparib", rownames(outtmp)),]
+                rownames(outtmp) <- gsub("poly\\(|, [1-3]\\)","", rownames(outtmp))
+                
+                rownames(outtmp) <- gsub("GSID",  paste0(" ",GSID_levels[g], " vs. "), rownames(outtmp))
+                rownames(outtmp)[!(grepl("vs", rownames(outtmp)))]  <- paste(rownames(outtmp)[!(grepl("vs", rownames(outtmp)))], levels(dataset$GSID)[1],  sep = " in " )
+
+                
+                output <- rbind(output,outtmp)
+        }
+        
+        if(g < length(GSID_levels)){
+                
+                output <- rbind(output, " ", colnames(output))
+        }
+        
+}
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure5B_Stats_New_All.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
