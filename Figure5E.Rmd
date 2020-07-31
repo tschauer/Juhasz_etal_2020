@@ -232,7 +232,7 @@ write.table(output, file = "Figure5E_Stats_Ref_ALC1_NT.txt", quote = F, sep = "\
 
 
 ```{r, fig.height=5, fig.width=18}
-# re-fit with Olaparib reference
+# re-fit with WT Olaparib reference
 dataset$genotype <- relevel(dataset$genotype, ref = "WT")
 dataset$treatment <- relevel(dataset$treatment, ref = "Olaparib")
 
@@ -257,6 +257,32 @@ kable(output, row.names = T)
 write.table(output, file = "Figure5E_Stats_Ref_WT_Olaparib.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
 ```
 
+
+```{r, fig.height=5, fig.width=18}
+# re-fit with ALC1KO Olaparib reference
+dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO")
+dataset$treatment <- relevel(dataset$treatment, ref = "Olaparib")
+
+fit <- lmer(Outcome ~ treatment*genotype + (1|experiment), data = dataset)
+
+output <- coef(summary(fit))
+output <- output[grep("treatment|genotype", rownames(output)),]
+
+rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$treatment)[1])
+
+rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$genotype)[1])
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure5E_Stats_Ref_ALC1KO_Olaparib.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
 
 
 ## ANOVA

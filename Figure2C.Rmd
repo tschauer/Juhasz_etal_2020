@@ -314,3 +314,67 @@ anova(fit2a, fit2b)
 
 ```
 
+## New analysis
+
+* fit model for each conc. independently
+
+```{r}
+dataset$genotype <- relevel(dataset$genotype, ref = "WT")
+
+
+for(i in 2:length(levels(dataset$treatment))){
+        
+        dataset_sub <- dataset[dataset$treatment == levels(dataset$treatment)[i],]
+        
+        for(g in seq_along(levels(dataset_sub$genotype))){
+                
+                
+                cat("Olaparib: ", levels(dataset$treatment)[i], "nM", "\n",
+                    "Genotype: ", levels(dataset$genotype)[g], "\n")
+                
+                
+                dataset_sub$genotype <- relevel(dataset_sub$genotype, ref = levels(dataset_sub$genotype)[g])
+
+                fit_sub <- lm(NormOutcome2 ~ genotype, data = dataset_sub)
+                
+                print(summary(fit_sub))
+                cat("AIC: ", AIC(fit_sub))
+                
+                
+                simres <- simulateResiduals(fittedModel = fit_sub)
+                plot(simres)
+                
+                if(i == 2 & g == 1){
+                        output <- coef(summary(fit_sub))
+                        output <- output[grep("genotype", rownames(output)),]
+                        rownames(output) <- paste0(gsub("genotype",  paste0(" ",levels(dataset$genotype)[g], " vs. "), rownames(output)),
+                                                   " in Olaparib ", levels(dataset$treatment)[i], "nM")
+                } else {
+                        outtmp <- coef(summary(fit_sub))
+                        outtmp <- outtmp[grep("genotype", rownames(outtmp)),]
+                        rownames(outtmp) <- paste0(gsub("genotype",  paste0(" ",levels(dataset$genotype)[g], " vs. "), rownames(outtmp)),
+                                                   " in Olaparib ", levels(dataset$treatment)[i], "nM")
+                        
+                        output <- rbind(output,outtmp)
+                        
+                        if(g == length(levels(dataset_sub$genotype)) & i < length(levels(dataset$treatment))){
+                                
+                                output <- rbind(output, " ", colnames(output))
+                        }
+                }
+                
+        }
+        
+        
+}
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "Figure2C_Stats_New_All.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+
+
