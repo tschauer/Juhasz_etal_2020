@@ -301,6 +301,35 @@ write.table(output, file = "FigureS4A_Stats_Ref_BRCA1.txt", quote = F, sep = "\t
 
 
 
+```{r, fig.height=5, fig.width=18}
+# re-fit with Olaparib siCtrl reference
+dataset$genotype <- relevel(dataset$genotype, ref = "siCtrl")
+dataset$treatment <- relevel(dataset$treatment, ref = "Olaparib")
+
+fit <- lm(NormOutcome2 ~ treatment*genotype, data = dataset)
+
+
+output <- coef(summary(fit))
+output <- output[grep("treatment|genotype", rownames(output)),]
+
+rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("genotype", rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$treatment)[1])
+
+rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))] <- 
+        paste0(rownames(output)[grepl("treatment",rownames(output))&!grepl("\\:",rownames(output))], " in ", levels(dataset$genotype)[1])
+
+rownames(output) <- gsub("genotype",   paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
+rownames(output) <- gsub("treatment",  paste0(" ",levels(dataset$treatment)[1], " vs. "), rownames(output))
+
+
+# suggested result table
+kable(output, row.names = T)
+
+write.table(output, file = "FigureS4A_Stats_Ref_Olaparib_siCtrl.txt", quote = F, sep = "\t", row.names = T, col.names = NA)
+```
+
+
+
 ## ANOVA
 
 
