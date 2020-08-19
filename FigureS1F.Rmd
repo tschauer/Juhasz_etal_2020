@@ -47,9 +47,9 @@ dataset <- melt(dataset, variable.name = "Treatment", value.name = "Counts")
 dataset$genotype <- relevel(dataset$genotype, ref = "WT")
 dataset$UID <- relevel(dataset$UID, ref = "exp1 WT")
 
-dataset$Niraparib <- gsub("NT","1",dataset$Treatment)
-dataset$Niraparib <- gsub("niraparib_|nM","",dataset$Niraparib)
-dataset$Niraparib <- log10(as.integer(dataset$Niraparib))
+dataset$Veliparib <- gsub("NT","1",dataset$Treatment)
+dataset$Veliparib <- gsub("veliparib_|nM","",dataset$Veliparib)
+dataset$Veliparib <- log10(as.integer(dataset$Veliparib))
 
 
 dataset$Offset <- NA
@@ -63,7 +63,7 @@ dataset$NormCounts <- dataset$Counts / dataset$Offset
 
 dataset$Offset2 <- NA
 for(gidx in levels(dataset$genotype)){
-        dataset$Offset2[dataset$genotype == gidx] <- mean(dataset$NormCounts[dataset$genotype == gidx & dataset$Niraparib == 0])
+        dataset$Offset2[dataset$genotype == gidx] <- mean(dataset$NormCounts[dataset$genotype == gidx & dataset$Veliparib == 0])
 }
 
 dataset$NormCounts2 <- dataset$NormCounts / dataset$Offset2
@@ -82,13 +82,13 @@ kable(dataset, row.names = F)
 library(ggplot2)
 
 # raw data
-ggplot(dataset, aes(x=Niraparib, y=Counts)) + 
+ggplot(dataset, aes(x=Veliparib, y=Counts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_smooth(method=lm, formula = y ~ poly(x, 2), se=FALSE, colour="#666666") +
         geom_point(aes(colour=Treatment, shape=Experiment), size=2) +        
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") +
+        xlab(label = "Veliparib (log10 nM)") +
         scale_shape_manual(values=14:19) +
         scale_color_manual(values=c("#999999","#0072B2","#CC79A7","#009E73"))
 ```
@@ -96,107 +96,107 @@ ggplot(dataset, aes(x=Niraparib, y=Counts)) +
 
 ```{r, fig.height=4, fig.width=16}
 # Counts Linear
-ggplot(dataset, aes(x=Niraparib, y=Counts)) + 
+ggplot(dataset, aes(x=Veliparib, y=Counts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)")
+        xlab(label = "Veliparib (log10 nM)")
 
 
 # NormCounts Linear
-ggplot(dataset, aes(x=Niraparib, y=NormCounts)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)")
+        xlab(label = "Veliparib (log10 nM)")
 
 
 # NormCounts2 Linear
-ggplot(dataset, aes(x=Niraparib, y=NormCounts2)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts2)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ x, se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)")
+        xlab(label = "Veliparib (log10 nM)")
 
 # Counts Quadratic
-ggplot(dataset, aes(x=Niraparib, y=Counts)) + 
+ggplot(dataset, aes(x=Veliparib, y=Counts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 # NormCounts Quadratic
-ggplot(dataset, aes(x=Niraparib, y=NormCounts)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 # NormCounts2 Quadratic
-ggplot(dataset, aes(x=Niraparib, y=NormCounts2)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts2)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 # Counts Cubic
-ggplot(dataset, aes(x=Niraparib, y=Counts)) + 
+ggplot(dataset, aes(x=Veliparib, y=Counts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 # NormCounts Cubic
-ggplot(dataset, aes(x=Niraparib, y=NormCounts)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 # NormCounts2 Cubic
-ggplot(dataset, aes(x=Niraparib, y=NormCounts2)) + 
+ggplot(dataset, aes(x=Veliparib, y=NormCounts2)) + 
         theme_bw() +
         theme(panel.grid=element_blank(), text = element_text(size=14)) +
         geom_point(colour="#333333") +
         geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, colour="#666666") +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") 
+        xlab(label = "Veliparib (log10 nM)") 
 
 
 library(Cairo)
 
 cairo_pdf("FigureS1F_v1.pdf", width = 14, height = 4, family = "Arial")
 
-ggplot(dataset, aes(x=Niraparib, y=NormCounts2)) +
+ggplot(dataset, aes(x=Veliparib, y=NormCounts2)) +
         theme_bw() +
         theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
               axis.line = element_line(colour = "black"), text = element_text(size=14),
               panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = genotype)) +
-        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
         facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") +
+        xlab(label = "Veliparib (log10 nM)") +
         ylab(label = "Normalized Counts") +
         scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
@@ -205,15 +205,15 @@ dev.off()
 
 cairo_pdf("FigureS1F_v2.pdf", width = 6, height = 4, family = "Arial")
 
-ggplot(dataset, aes(x=Niraparib, y=NormCounts2)) +
+ggplot(dataset, aes(x=Veliparib, y=NormCounts2)) +
         theme_bw() +
         theme(panel.grid.major=element_blank(), panel.grid.minor=element_blank(), 
               axis.line = element_line(colour = "black"), text = element_text(size=14),
               panel.border = element_blank(), panel.background = element_blank()) +
         geom_point(aes(colour = genotype)) +
-        geom_smooth(method=lm, formula = y ~ poly(x, 3), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
+        geom_smooth(method=lm, formula = y ~ poly(x, 2), se=TRUE, aes(colour = genotype), fill='#DDDDDD', size=0.5) +
         #facet_grid(. ~ genotype) +
-        xlab(label = "Niraparib (log10 nM)") +
+        xlab(label = "Veliparib (log10 nM)") +
         ylab(label = "Normalized Counts") +
         scale_color_manual(values=c('#000000','#800000','#000080','#808080'))
 
@@ -237,7 +237,7 @@ library(bbmle)
 ### Linear formula
 
 ```{r}
-fit1 <- lm(Counts ~ Experiment + Niraparib*genotype, data = dataset)
+fit1 <- lm(Counts ~ Experiment + Veliparib*genotype, data = dataset)
 print(summary(fit1))
 cat("AIC: ", AIC(fit1))
 
@@ -246,7 +246,7 @@ plot(simres)
 ```
 
 ```{r}
-fit2 <- lm(NormCounts ~ Niraparib*genotype, data = dataset)
+fit2 <- lm(NormCounts ~ Veliparib*genotype, data = dataset)
 print(summary(fit2))
 cat("AIC: ", AIC(fit2))
 
@@ -255,7 +255,7 @@ plot(simres)
 ```
 
 ```{r}
-fit3 <- lm(NormCounts2 ~ Niraparib*genotype, data = dataset)
+fit3 <- lm(NormCounts2 ~ Veliparib*genotype, data = dataset)
 print(summary(fit3))
 cat("AIC: ", AIC(fit3))
 
@@ -265,7 +265,7 @@ plot(simres)
 
 
 ```{r}
-fit4 <- lmer(Counts ~ Niraparib*genotype + (1|UID), data = dataset)
+fit4 <- lmer(Counts ~ Veliparib*genotype + (1|UID), data = dataset)
 print(summary(fit4))
 cat("AIC: ", AIC(fit4))
 
@@ -278,7 +278,7 @@ plot(simres)
 ### Quadratic formula
 
 ```{r}
-fit5 <- lm(Counts ~ Experiment + poly(Niraparib, 2)*genotype, data = dataset)
+fit5 <- lm(Counts ~ Experiment + poly(Veliparib, 2)*genotype, data = dataset)
 print(summary(fit5))
 cat("AIC: ", AIC(fit5))
 
@@ -287,7 +287,7 @@ plot(simres)
 ```
 
 ```{r}
-fit6 <- lm(NormCounts ~ poly(Niraparib, 2)*genotype, data = dataset)
+fit6 <- lm(NormCounts ~ poly(Veliparib, 2)*genotype, data = dataset)
 print(summary(fit6))
 cat("AIC: ", AIC(fit6))
 
@@ -296,7 +296,7 @@ plot(simres)
 ```
 
 ```{r}
-fit7 <- lm(NormCounts2 ~ poly(Niraparib, 2)*genotype, data = dataset)
+fit7 <- lm(NormCounts2 ~ poly(Veliparib, 2)*genotype, data = dataset)
 print(summary(fit7))
 cat("AIC: ", AIC(fit7))
 
@@ -306,7 +306,7 @@ plot(simres)
 
 
 ```{r}
-fit8 <- lmer(Counts ~ poly(Niraparib, 2)*genotype + (1|UID), data = dataset)
+fit8 <- lmer(Counts ~ poly(Veliparib, 2)*genotype + (1|UID), data = dataset)
 print(summary(fit8))
 cat("AIC: ", AIC(fit8))
 
@@ -319,7 +319,7 @@ plot(simres)
 ### Cubic formula
 
 ```{r}
-fit9 <- lm(Counts ~ Experiment + poly(Niraparib, 3)*genotype, data = dataset)
+fit9 <- lm(Counts ~ Experiment + poly(Veliparib, 3)*genotype, data = dataset)
 print(summary(fit9))
 cat("AIC: ", AIC(fit9))
 
@@ -328,7 +328,7 @@ plot(simres)
 ```
 
 ```{r}
-fit10 <- lm(NormCounts ~ poly(Niraparib, 3)*genotype, data = dataset)
+fit10 <- lm(NormCounts ~ poly(Veliparib, 3)*genotype, data = dataset)
 print(summary(fit10))
 cat("AIC: ", AIC(fit10))
 
@@ -337,7 +337,7 @@ plot(simres)
 ```
 
 ```{r}
-fit11 <- lm(NormCounts2 ~ poly(Niraparib, 3)*genotype, data = dataset)
+fit11 <- lm(NormCounts2 ~ poly(Veliparib, 3)*genotype, data = dataset)
 print(summary(fit11))
 cat("AIC: ", AIC(fit11))
 
@@ -347,7 +347,7 @@ plot(simres)
 
 
 ```{r}
-fit12 <- lmer(Counts ~ poly(Niraparib, 3)*genotype + (1|UID), data = dataset)
+fit12 <- lmer(Counts ~ poly(Veliparib, 3)*genotype + (1|UID), data = dataset)
 print(summary(fit12))
 cat("AIC: ", AIC(fit12))
 
@@ -371,10 +371,10 @@ ICtab(fit1,fit2,fit3,fit4,
 # Final Result
 
 ```{r, fig.height=5, fig.width=18}
-fit <- fit11
+fit <- fit7
 
 output <- coef(summary(fit))
-output <- output[grep("Niraparib", rownames(output)),]
+output <- output[grep("Veliparib", rownames(output)),]
 
 rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
 rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
@@ -392,11 +392,11 @@ write.table(output, file = "FigureS1F_Stats_Ref_WT.txt", quote = F, sep = "\t", 
 # re-fit with ALC1KO reference
 dataset$genotype <- relevel(dataset$genotype, ref = "ALC1KO")
         
-fit <- lm(NormCounts2 ~ poly(Niraparib,3)*genotype, data = dataset)
+fit <- lm(NormCounts2 ~ poly(Veliparib,2)*genotype, data = dataset)
 
 
 output <- coef(summary(fit))
-output <- output[grep("Niraparib", rownames(output)),]
+output <- output[grep("Veliparib", rownames(output)),]
 
 rownames(output) <- gsub("poly\\(|, [1-3]\\)","", rownames(output) )
 rownames(output) <- gsub("genotype",  paste0(" ",levels(dataset$genotype)[1], " vs. "), rownames(output))
@@ -413,8 +413,8 @@ write.table(output, file = "FigureS1F_Stats_Ref_ALC1KO.txt", quote = F, sep = "\
 # Anova
 
 ```{r}
-fita <- lm(NormCounts2 ~ poly(Niraparib, 3)*genotype, data = dataset)
-fitb <- lm(NormCounts2 ~ poly(Niraparib, 3)+genotype, data = dataset)
+fita <- lm(NormCounts2 ~ poly(Veliparib, 2)*genotype, data = dataset)
+fitb <- lm(NormCounts2 ~ poly(Veliparib, 2)+genotype, data = dataset)
 
 # anova table
 anova(fita, fitb)
